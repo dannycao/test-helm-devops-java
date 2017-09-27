@@ -1,0 +1,44 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: "ddcao-kube-java-27sep1640-service"
+spec:
+  # if your cluster supports it, uncomment the following to automatically create
+  # an external load-balanced IP for the frontend service.
+  #type: LoadBalancer
+  type: NodePort
+  ports:
+  # the port that this service should serve on
+  - name: http
+    port: 9080
+  - name: https
+    port: 9443
+
+  selector:
+    app: "ddcao-kube-java-27sep1640-selector"
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: "ddcao-kube-java-27sep1640-deployment"
+spec:
+  # this replicas value is default
+  # modify it according to your case
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: "ddcao-kube-java-27sep1640-selector"
+    spec:
+      containers:
+      - name: ddcao-kube-java-27sep1640
+        image: ddcao-kube-java-27sep1640:latest
+        readinessProbe:
+          httpGet:
+            path: /ddcao-kube-java-27sep1640/health
+            port: 9080
+          initialDelaySeconds: 20
+        # resources:
+        #   requests:
+        #     cpu: 100m
+        #     memory: 100Mi
